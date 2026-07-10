@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amplitude for Quick-Service Restaurants</title>
+<style>
+/* ── RESET ── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  background: #e5e5e5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 76px 0 64px;
+}
+
+/* ── PAGE ── */
+.page {
+  width: 850px;
+  background: #fff;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  position: relative;
+}
+
+/* ── PRINT ── */
+@media print {
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  @page { size: 850px 1330px; margin: 0; }
+  html, body { background: #fff !important; padding: 0 !important; margin: 0 !important; display: block !important; width: 850px !important; }
+  .page { width: 850px !important; box-shadow: none !important; page-break-inside: avoid; }
+  .toolbar { display: none !important; }
+  [contenteditable] { background: none !important; box-shadow: none !important; outline: none !important; }
+  .upload-overlay, .img-overlay, .logo-slot-overlay { display: none !important; }
+}
+
+/* ── HEADER ── */
+.header {
+  background: linear-gradient(150deg, #001233 0%, #001A4F 55%, #0a1a55 100%);
+  padding: 22px 40px 40px;
+  position: relative;
+  overflow: hidden;
+  min-height: 220px;
+}
+
+/* Logo bar */
+.logo-bar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 26px;
+  position: relative;
+  z-index: 3;
+}
+.logo-upload-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.logo-upload-wrap:hover .upload-overlay { opacity: 1; }
+.upload-overlay {
+  position: absolute;
+  inset: -4px;
+  background: rgba(0,82,242,0.25);
+  border: 1.5px dashed rgba(255,255,255,0.5);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+  z-index: 10;
+}
+.upload-overlay span {
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(0,0,0,0.5);
+  padding: 3px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+/* Amplitude logo (official file, forced white for dark header) */
+.amp-logo-img {
+  height: 26px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.logo-divider {
+  color: rgba(255,255,255,0.35);
+  font-size: 18px;
+  font-weight: 300;
+  margin: 0 14px;
+  line-height: 1;
+  user-select: none;
+}
+
+/* Vertical label in place of a single partner logo */
+.vertical-label {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+/* Header content */
+.header-content {
+  max-width: 540px;
+  position: relative;
+  z-index: 3;
+}
+.header h1 {
+  color: #fff;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: -0.6px;
+  margin-bottom: 14px;
+}
+.header-sub {
+  color: rgba(255,255,255,0.7);
+  font-size: 13.5px;
+  line-height: 1.6;
+  max-width: 470px;
+}
+
+/* 3D shapes */
+.shapes-wrap {
+  position: absolute;
+  top: 0; right: 0;
+  width: 380px; height: 245px;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.shapes-wrap svg { width: 100%; height: 100%; }
+
+/* ── BODY ── */
+.body {
+  padding: 28px 40px 20px;
+  background: #fff;
+}
+
+/* Challenge row */
+.challenge-row {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+  margin-bottom: 22px;
+}
+.challenge-left { flex: 1.15; }
+.challenge-intro {
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 1.45;
+  color: #111;
+  margin-bottom: 16px;
+}
+.challenge-sub {
+  font-size: 13px;
+  color: #444;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+.challenge-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.challenge-list li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 13px;
+  color: #333;
+  line-height: 1.55;
+  margin-bottom: 8px;
+}
+.challenge-list li::before {
+  content: '●';
+  color: #0052F2;
+  font-size: 10px;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+/* Right column — quote / image card */
+.challenge-right { flex: 0.85; }
+.screenshot-wrap {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #f4f6fb;
+  min-height: 210px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.screenshot-wrap:hover .img-overlay { opacity: 1; }
+.screenshot-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 6px;
+}
+.screenshot-placeholder {
+  width: 100%;
+  padding: 6px;
+}
+.quote-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+  padding: 24px 22px;
+  border-top: 4px solid #0052F2;
+}
+.quote-card .qmark {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 46px;
+  line-height: 0.5;
+  color: #0052F2;
+  display: block;
+  height: 22px;
+}
+.quote-card .qtext {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+  line-height: 1.42;
+  letter-spacing: -0.2px;
+  margin: 6px 0 16px;
+}
+.quote-card .qname { font-size: 12.5px; font-weight: 700; color: #111; }
+.quote-card .qtitle { font-size: 11px; color: #777; margin-top: 1px; }
+
+.img-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  border-radius: 8px;
+}
+.img-overlay-btn {
+  background: #fff;
+  color: #333;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+}
+.img-overlay-btn:hover { background: #f0f0f0; }
+.img-overlay-btn.danger { background: #fee; color: #c00; }
+.img-overlay-btn.danger:hover { background: #fcc; }
+
+/* Body copy */
+.body-copy {
+  font-size: 13px;
+  color: #444;
+  line-height: 1.6;
+  margin-bottom: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #ebebeb;
+}
+.body-copy b { color: #111; }
+
+/* Features */
+.features-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111;
+  text-align: center;
+  margin-bottom: 18px;
+  letter-spacing: -0.3px;
+}
+.features-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 24px;
+}
+.feature {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.feature-icon-wrap {
+  flex-shrink: 0;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 1px;
+}
+.feature-icon-wrap svg { width: 28px; height: 28px; }
+.feature-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111;
+  line-height: 1.3;
+  margin-bottom: 6px;
+}
+.feature-desc {
+  font-size: 12.5px;
+  color: #555;
+  line-height: 1.55;
+}
+
+/* ── QUOTE STRIP ── */
+.quote-strip {
+  background: #fff;
+  padding: 22px 40px 4px;
+}
+.quote-strip-label {
+  text-align: center;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: #999;
+  margin-bottom: 16px;
+}
+.quote-strip-row { display: flex; gap: 28px; }
+.qs-item { flex: 1; border-left: 3px solid #0052F2; padding-left: 14px; }
+.qs-text { font-size: 13px; font-style: italic; color: #333; line-height: 1.5; margin-bottom: 6px; }
+.qs-attr { font-size: 11px; color: #777; }
+.qs-attr b { color: #111; font-style: normal; }
+
+/* ── LOGO STRIP ── */
+.logo-strip {
+  background: #f5f6fa;
+  padding: 18px 40px 16px;
+  border-top: 1px solid #eee;
+}
+.logo-strip-label {
+  text-align: center;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: #999;
+  margin-bottom: 18px;
+}
+.logos-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+.logo-slot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.15s;
+  min-width: 60px;
+}
+.logo-slot:hover { background: rgba(0,0,0,0.04); }
+.logo-slot:hover .logo-slot-overlay { opacity: 1; }
+.logo-slot-img { height: 28px; width: auto; opacity: 0.5; filter: grayscale(100%); display: block; }
+.logo-slot-text {
+  font-size: 12px;
+  font-weight: 700;
+  color: #b8bcc9;
+  letter-spacing: 0.3px;
+}
+.logo-slot-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,82,242,0.10);
+  border: 1px dashed rgba(0,82,242,0.4);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+.logo-slot-overlay span { font-size: 9px; color: #0052F2; font-weight: 700; }
+
+/* ── FOOTER ── */
+.footer {
+  padding: 12px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #eee;
+  background: #fff;
+}
+.footer-copy { font-size: 10.5px; color: #bbb; }
+.ae-block { text-align: right; }
+.ae-name { font-size: 12.5px; font-weight: 700; color: #222; }
+.ae-title { font-size: 11px; color: #777; margin-top: 1px; }
+.ae-contact { font-size: 11px; color: #0052F2; margin-top: 2px; }
+
+/* ── EDIT UI ── */
+[contenteditable] { outline: none; cursor: text; }
+[contenteditable]:hover { background: rgba(0,82,242,0.06); border-radius: 2px; }
+[contenteditable]:focus { background: rgba(0,82,242,0.09); border-radius: 2px; box-shadow: 0 0 0 2px rgba(0,82,242,0.35); }
+
+/* Toolbar */
+.toolbar {
+  position: fixed;
+  top: 16px; left: 50%; transform: translateX(-50%);
+  background: #001A4F;
+  color: rgba(255,255,255,0.9);
+  display: flex; align-items: center; gap: 0;
+  border-radius: 24px;
+  padding: 0;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  z-index: 9999;
+  font-size: 12px;
+  overflow: hidden;
+}
+.toolbar-item {
+  padding: 9px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex; align-items: center; gap: 6px;
+  transition: background 0.12s;
+  border: none; background: none; color: rgba(255,255,255,0.85);
+  font-size: 12px; font-family: inherit;
+}
+.toolbar-item:hover { background: rgba(255,255,255,0.1); }
+.toolbar-sep { width: 1px; background: rgba(255,255,255,0.15); height: 28px; }
+
+/* Hidden file inputs */
+input[type=file] { display: none; }
+</style>
+</head>
+<body>
+
+<!-- Hidden file inputs -->
+<input type="file" id="upload-amp-logo" accept="image/*">
+<input type="file" id="upload-screenshot" accept="image/*">
+<input type="file" id="upload-logo-0" accept="image/*">
+<input type="file" id="upload-logo-1" accept="image/*">
+<input type="file" id="upload-logo-2" accept="image/*">
+<input type="file" id="upload-logo-3" accept="image/*">
+<input type="file" id="upload-logo-4" accept="image/*">
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <span class="toolbar-item">✏️ Click any text to edit</span>
+  <div class="toolbar-sep"></div>
+  <span class="toolbar-item">🖼️ Hover images to replace</span>
+  <div class="toolbar-sep"></div>
+  <button class="toolbar-item" onclick="window.print()">⬇️ Save as PDF</button>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+
+    <!-- 3D shapes -->
+    <div class="shapes-wrap">
+      <svg viewBox="0 0 380 245" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="190" y="-55" width="155" height="155" rx="22" fill="url(#s1)" opacity="0.9" transform="rotate(18 190 -55)"/>
+        <rect x="270" y="20" width="130" height="130" rx="18" fill="url(#s2)" opacity="0.75" transform="rotate(-8 270 20)"/>
+        <rect x="130" y="10" width="90" height="90" rx="14" fill="url(#s3)" opacity="0.55" transform="rotate(30 130 10)"/>
+        <rect x="300" y="100" width="180" height="180" rx="28" fill="url(#s4)" opacity="0.25" transform="rotate(-15 300 100)"/>
+        <defs>
+          <linearGradient id="s1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4083FF"/><stop offset="100%" stop-color="#0052F2"/></linearGradient>
+          <linearGradient id="s2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6980FF"/><stop offset="100%" stop-color="#0052F2"/></linearGradient>
+          <linearGradient id="s3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#A373FF"/><stop offset="100%" stop-color="#6980FF"/></linearGradient>
+          <linearGradient id="s4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#001A4F"/><stop offset="100%" stop-color="#001233"/></linearGradient>
+        </defs>
+      </svg>
+    </div>
+
+    <!-- Logo bar -->
+    <div class="logo-bar">
+      <!-- Amplitude logo (official Wikimedia file) -->
+      <div class="logo-upload-wrap" onclick="document.getElementById('upload-amp-logo').click()" title="Click to replace Amplitude logo">
+        <div id="amp-logo-display">
+          <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI1LjQuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjAgMCAyNDAwIDUwNi45MiIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMjQwMCA1MDYuOTI7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPHN0eWxlIHR5cGU9InRleHQvY3NzIj4KCS5zdDB7ZmlsbDojMTAwNjlGO30KPC9zdHlsZT4KPGc+Cgk8Zz4KCQk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjI1LjQ4LDExNi4yNGMtMS4zOC0xLjgyLTIuOTUtMi43OC00LjctMi43OGMtMS40NCwwLTIuNzUsMC42NC0zLjYsMS4xOQoJCQljLTEzLjI2LDEwLjQyLTMxLjQsNTQuNTMtNDYuMjcsMTEyLjY3bDEzLjE2LDAuMTVjMjYsMC4yOSw1Mi44NCwwLjYsNzkuMzgsMS4wMWMtNi45OS0yNi42My0xMy42MS00OS40NS0xOS42Ny02Ny44OAoJCQlDMjM0LjkyLDEzMy42NywyMjguOTQsMTIxLjYxLDIyNS40OCwxMTYuMjR6Ii8+CgkJPHBhdGggY2xhc3M9InN0MCIgZD0iTTI1NC45OSw0LjE1Yy0xMzcuNTIsMC0yNDksMTExLjQ4LTI0OSwyNDljMCwxMzcuNTIsMTExLjQ4LDI0OSwyNDksMjQ5czI0OS0xMTEuNDgsMjQ5LTI0OQoJCQlDNTAzLjk5LDExNS42MywzOTIuNTEsNC4xNSwyNTQuOTksNC4xNXogTTQzNC4wNCwyNTcuNjdjLTAuMDIsMC4wMi0wLjA0LDAuMDMtMC4wNiwwLjA1Yy0wLjI3LDAuMjItMC41NCwwLjQyLTAuODMsMC42MgoJCQljLTAuMDksMC4wNi0wLjE4LDAuMTMtMC4yOCwwLjE5Yy0wLjE5LDAuMTItMC4zOSwwLjI0LTAuNTgsMC4zNWMtMC4xOCwwLjExLTAuMzYsMC4yMS0wLjU0LDAuMzFjLTAuMDEsMC4wMS0wLjAyLDAuMDEtMC4wMywwLjAyCgkJCWMtMS44MywwLjk2LTMuOTIsMS41MS02LjEzLDEuNTFjLTAuMTgsMC0xMTcuOTUsMC0xMTcuOTUsMGMwLjk0LDMuOTEsMS45Nyw4LjM1LDMuMDksMTMuMThjNi40NiwyNy45MSwyMy42NCwxMDIuMDYsNDEuODgsMTAyLjA2CgkJCWwwLjM2LDAuMDFsMC4yLTAuMDNsMC4zNSwwYzE0LjI1LDAsMjEuNTItMjAuNiwzNy40Ni02NS43NGwwLjE5LTAuNTVjMi41Ni03LjI1LDUuNDUtMTUuNDMsOC41OC0yNC4wOGwwLjgtMi4yMWwwLjAxLDAKCQkJYzAuODEtMi4xNiwyLjg5LTMuNyw1LjM0LTMuN2MzLjE1LDAsNS43MSwyLjU2LDUuNzEsNS43MWMwLDAuNTctMC4wOSwxLjEyLTAuMjQsMS42NGwwLDBsLTAuNjYsMi4yMgoJCQljLTEuNjYsNS4zNy0zLjQzLDEyLjY5LTUuNDcsMjEuMTZjLTkuNSwzOS4zNy0yMy44NSw5OC44NS02MC42Nyw5OC44NWwtMC4yNywwYy0yMy43OS0wLjE5LTM4LjAzLTM4LjIyLTQ0LjExLTU0LjQ2CgkJCWMtMTEuMzctMzAuMzctMTkuOTctNjIuNzMtMjguMjctOTQuMDdIMTYzLjM0bC0yMi41NCw3Mi4xNGwtMC4zMy0wLjI2Yy0yLjA2LDMuMjQtNS42OCw1LjMyLTkuNjcsNS4zMgoJCQljLTYuMjksMC0xMS40NC01LjEyLTExLjQ3LTExLjQxbDAuMDItMC4zOWwxLjM2LTguMTZjMy4xMS0xOC41NCw2Ljg0LTM3Ljc4LDExLjEtNTcuMjNIODUuOTdsLTAuMTctMC4xNwoJCQljLTguMzItMS4yLTE0LjcxLTguNTQtMTQuNzEtMTcuMWMwLTguMzksNS45NC0xNS41NCwxNC4xMi0xNi45OWMwLjc1LTAuMSwyLjI3LTAuMjMsNS4zNi0wLjIzYzAuNjYsMCwxLjQsMCwyLjIzLDAuMDIKCQkJYzE0LjUzLDAuMjUsMjkuOTUsMC40OCw0Ni44NiwwLjdjMjMuOTMtOTcuMjQsNTEuNjUtMTQ2LjYsODIuNC0xNDYuNzRjMzIuOTksMCw1Ny40Nyw3NS4xMiw3Ny4wNiwxNDguNjFsMC4wOCwwLjI5CgkJCWM0MC4yNSwwLjgxLDgzLjE1LDEuOTgsMTI0Ljg2LDQuOTdsMS43NSwwLjE2YzAuNjcsMC4wMSwxLjMzLDAuMDgsMS45NywwLjE4bDAuMjQsMC4wMmMwLjA3LDAuMDEsMC4xNCwwLjAzLDAuMjEsMC4wNQoJCQljMC4wNCwwLjAxLDAuMDcsMC4wMiwwLjExLDAuMDJjNi4wNywxLjIyLDEwLjU3LDYuNTQsMTAuNTcsMTIuOTRDNDM4LjkxLDI1MS41NSw0MzcuMDEsMjU1LjI0LDQzNC4wNCwyNTcuNjd6Ii8+Cgk8L2c+Cgk8Zz4KCQk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNNjQyLjE3LDMxNS40NWwtMTkuNzQsNDguNzhoLTU3LjM1TDY3NC4yLDEwOS41Mmg1MC42NWwxMDguNzQsMjU0LjcyaC01Ni45OGwtMTkuNzQtNDguNzhINjQyLjE3egoJCQkgTTY5OS4xNSwxNzMuOTRsLTM3LjI0LDkyLjczaDc1LjIyTDY5OS4xNSwxNzMuOTR6Ii8+CgkJPHBhdGggY2xhc3M9InN0MCIgZD0iTTExNTYuODIsMjY2LjN2OTcuOTRoLTUxLjc2di05My40N2MwLTI4LjMtMTMuNzgtNDMuNTctMzcuOTgtNDMuNTdjLTEwLjgsMC0yMi43Miw0Ljg0LTMzLjUyLDE5Ljc0CgkJCWMwLjc1LDYuMzMsMS40OSwxMi42NiwxLjQ5LDE5LjM2djk3Ljk0aC01MS43NnYtOTMuNDdjMC0yOC4zLTEzLjc4LTQzLjU3LTM4LjM2LTQzLjU3Yy0xMC4wNSwwLTIxLjIzLDUuOTYtMzEuNjUsMjAuMTF2MTE2LjkzCgkJCWgtNTEuNzZWMTg1Ljg2aDUxLjc2djEwLjhjMTEuMTctMTAuNDMsMjMuMDktMTYuMzksNDMuOTQtMTYuMzljMjIuNzIsMCw0Mi44Miw4Ljk0LDU2Ljk4LDI1LjMyCgkJCWMxOC45OS0xNy41LDM2Ljg3LTI1LjMyLDY0LjgtMjUuMzJDMTEyMi41NiwxODAuMjcsMTE1Ni44MiwyMTQuMTYsMTE1Ni44MiwyNjYuM3oiLz4KCQk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTM4NC4zNSwyNzUuMjNjMCw1MS43Ni0zOS40Nyw5Mi43Mi04OC42Myw5Mi43MmMtMjAuMTEsMC0zNi44Ny01LjIxLTUwLjY0LTE0LjE1djk2LjQ1aC01MS43NnYtMjY0LjRoNTEuNzYKCQkJdjEwLjQzYzEzLjc4LTguOTQsMzAuNTQtMTQuMTUsNTAuNjQtMTQuMTVDMTM0NC44NywxODIuMTQsMTM4NC4zNSwyMjIuNzMsMTM4NC4zNSwyNzUuMjN6IE0xMzMzLjMzLDI3NS4yMwoJCQljMC0yNi40NC0xOS4zNi00OS41My00Ni4xOC00OS41M2MtMTUuMjcsMC0zMC41NCw1LjIxLTQyLjA4LDIwLjg1djU2Ljk4YzExLjU0LDE1LjI3LDI2LjgxLDIwLjQ4LDQyLjA4LDIwLjQ4CgkJCUMxMzEzLjk2LDMyNC4wMiwxMzMzLjMzLDMwMS4zLDEzMzMuMzMsMjc1LjIzeiIvPgoJCTxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xNDY1LjE1LDM2NC4yM2gtNTEuNzZWOTkuODRoNTEuNzZWMzY0LjIzeiIvPgoJCTxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xNTExLjcsMTIyLjkzYzAtMTcuNSwxMy43OC0zMC41NCwzMS4yOC0zMC41NGMxNy4xMywwLDMwLjkxLDEzLjAzLDMwLjkxLDMwLjU0CgkJCWMwLDE3LjEzLTEzLjc4LDI5Ljc5LTMwLjkxLDI5Ljc5QzE1MjUuNDgsMTUyLjcyLDE1MTEuNywxNDAuMDYsMTUxMS43LDEyMi45M3ogTTE1NjkuMDUsMTg1Ljg2djE3OC4zOGgtNTEuNzZWMTg1Ljg2SDE1NjkuMDV6Ii8+CgkJPHBhdGggY2xhc3M9InN0MCIgZD0iTTE3NTcuMSwzNjEuNjNjLTIxLjYsNi43LTMxLjI4LDguMTktNDguMDQsOC4xOWMtNDMuMiwwLTcxLjUtMzAuNTQtNzEuNS03Ni43MXYtNjMuNjhoLTM3LjYxdi00My41N2gzNy42MQoJCQl2LTYzLjY4aDUxLjM5djYzLjY4aDY0LjQydjQzLjU3aC02NC40MnY2My4zMWMwLDIwLjExLDEyLjI5LDI5LjQyLDMxLjI4LDI5LjQyYzkuNjgsMCwyMC4xMS0yLjIzLDMwLjE2LTQuODRMMTc1Ny4xLDM2MS42M3oiLz4KCQk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTk2NC44OSwzNjQuMjNoLTUxLjc2di0xMi42NmMtMTQuNTIsMTEuNTQtMzAuOTEsMTguMjUtNTEuMDIsMTguMjVjLTQ2LjkyLDAtNzguMi0zMy44OS03OC4yLTg1LjY1di05OC4zMQoJCQloNTEuNzZ2OTMuNDdjMCwyOC4zLDE0LjE1LDQzLjU3LDM4LjM2LDQzLjU3YzEzLjAzLDAsMjcuMTgtNy44MiwzOS4xLTIyLjM0di0xMTQuN2g1MS43NlYzNjQuMjN6Ii8+CgkJPHBhdGggY2xhc3M9InN0MCIgZD0iTTIxODQuNjEsMzY0LjIzaC01MS43NnYtMTAuNDNjLTEzLjc4LDguOTQtMzAuNTQsMTQuMTUtNTAuNjUsMTQuMTVjLTQ5LjE2LDAtODktNDAuNTktODktOTMuMQoJCQljMC01MS43NiwzOS44NS05Mi43Myw4OS05Mi43M2MyMC4xMSwwLDM2Ljg3LDUuMjEsNTAuNjUsMTQuMTVWOTkuODRoNTEuNzZWMzY0LjIzeiBNMjEzMi44NCwzMDMuNTR2LTU2Ljk4CgkJCWMtMTEuNTQtMTUuMjctMjYuODEtMjAuNDgtNDIuMDgtMjAuNDhjLTI3LjE4LDAtNDYuMTgsMjIuNzItNDYuMTgsNDguNzhjMCwyNi40NCwxOC45OSw0OS41Myw0Ni4xOCw0OS41MwoJCQlDMjEwNi4wMywzMjQuMzksMjEyMS4zLDMxOS4xOCwyMTMyLjg0LDMwMy41NHoiLz4KCQk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjM5NC42MywyODguMjdoLTEzMS40NWM0LjEsMjAuODUsMTcuODgsMzcuMjQsNDYuMTgsMzcuMjRjMTQuNTIsMCwyNC41OC00LjQ3LDMwLjE2LTEzLjQxaDU0CgkJCWMtOS42OCwzNC4yNi00My4yLDU3LjcyLTg1LjI4LDU3LjcyYy01Ny4zNSwwLTk2LjA4LTQxLjMzLTk2LjA4LTk0LjU5YzAtNTUuMTEsMzguMzYtOTQuOTYsOTQuNTktOTQuOTYKCQkJYzUxLjAyLDAsODksMzYuMTIsODksOTEuMjRDMjM5NS43NSwyNzguOTYsMjM5NS4zOCwyODMuMDUsMjM5NC42MywyODguMjd6IE0yMjYzLjU1LDI1Ny43M2g4MC44MQoJCQljLTIuOTgtMjIuMzQtMTYuMzktMzQuNjMtMzcuMjQtMzQuNjNDMjI4Mi4xNywyMjMuMSwyMjY4LjM5LDIzNy42MiwyMjYzLjU1LDI1Ny43M3oiLz4KCTwvZz4KPC9nPgo8L3N2Zz4K" class="amp-logo-img" alt="Amplitude">
+        </div>
+        <div class="upload-overlay"><span>Replace logo</span></div>
+      </div>
+
+      <span class="logo-divider">×</span>
+
+      <span class="vertical-label" contenteditable="true">Quick-Service Restaurants</span>
+    </div>
+
+    <!-- Headline -->
+    <div class="header-content">
+      <h1 contenteditable="true">From App to Drive-Through:<br>Convert More at Every Step</h1>
+      <p class="header-sub" contenteditable="true">Amplitude connects app, web, kiosk, and drive-through into one funnel — so the world's biggest quick-service brands can turn faster digital experiences into measurable revenue.</p>
+    </div>
+
+  </div><!-- /header -->
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- Challenge row -->
+    <div class="challenge-row">
+
+      <div class="challenge-left">
+        <p class="challenge-intro" contenteditable="true">A guest might browse on the web, order in the app, redeem a loyalty reward at a kiosk, and pay at the drive-through — but most QSR brands can't see that as one journey.</p>
+        <p class="challenge-sub" contenteditable="true">Across channels, digital teams struggle to:</p>
+        <ul class="challenge-list" id="challenge-list">
+          <li><span contenteditable="true">Connect app, web, kiosk, and drive-through into a single view of the customer</span></li>
+          <li><span contenteditable="true">Pinpoint where the conversion funnel leaks — and what a faster experience is worth in revenue</span></li>
+          <li><span contenteditable="true">Turn loyalty and order data into repeat visits and a higher average check</span></li>
+          <li><span contenteditable="true">Move from reporting to action without waiting on a central analytics team</span></li>
+        </ul>
+      </div>
+
+      <div class="challenge-right">
+        <div class="screenshot-wrap" id="screenshot-wrap">
+          <div class="screenshot-placeholder" id="screenshot-placeholder">
+            <div class="quote-card">
+              <span class="qmark">&ldquo;</span>
+              <div class="qtext" contenteditable="true">Amplitude and Snowflake have given RBI the ability to harness our data, turn it into something that's easily understood, and drive better business decisions.</div>
+              <div class="qname" contenteditable="true">Aryan Naraghi</div>
+              <div class="qtitle" contenteditable="true">Head of Data Analytics, Restaurant Brands International</div>
+            </div>
+          </div>
+          <img class="screenshot-img" id="screenshot-img" src="" alt="" style="display:none;">
+          <div class="img-overlay" id="screenshot-overlay">
+            <button class="img-overlay-btn" onclick="document.getElementById('upload-screenshot').click()">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 4l3-3 3 3" stroke="#333" stroke-width="1.5" stroke-linecap="round"/><path d="M1 10v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="#333" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Replace with image
+            </button>
+            <button class="img-overlay-btn danger" id="remove-screenshot-btn" style="display:none" onclick="removeScreenshot()">✕ Remove</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /challenge-row -->
+
+    <!-- Body copy -->
+    <p class="body-copy" contenteditable="true">For the world's largest QSR brands, small funnel gains scale to millions. At <b>Restaurant Brands International</b> — Burger King, Popeyes, Tim Hortons — speeding up app load by <b>43% on Android and 16% on iOS lifted conversions 4%</b>, and an ML-powered suggestive-sell model added <b>millions in drive-through revenue</b>. Amplitude connects every channel into one funnel so teams can find those gains and act on them fast.</p>
+
+    <!-- Features -->
+    <div class="features-title" contenteditable="true">One platform across the QSR digital funnel</div>
+    <div class="features-grid">
+
+      <div class="feature">
+        <div class="feature-icon-wrap">
+          <!-- Funnel / omnichannel -->
+          <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 6h20l-7 9v7l-6-3v-4L4 6z" stroke="#0052F2" stroke-width="1.6" stroke-linejoin="round" fill="none"/>
+          </svg>
+        </div>
+        <div class="feature-text">
+          <div class="feature-title" contenteditable="true">Omnichannel Journey Analysis</div>
+          <div class="feature-desc" contenteditable="true">Follow guests across app, web, kiosk, and drive-through as one funnel — and see exactly where orders stall or drop off.</div>
+        </div>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon-wrap">
+          <!-- Revenue / conversion trend -->
+          <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 24V4" stroke="#0052F2" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M4 24h20" stroke="#0052F2" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M7 18l5-5 4 3 7-8" stroke="#0052F2" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M21 8h3v3" stroke="#0052F2" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="feature-text">
+          <div class="feature-title" contenteditable="true">Conversion &amp; Revenue Impact</div>
+          <div class="feature-desc" contenteditable="true">Quantify what a faster app or smoother checkout is worth. RBI turned a 43% faster load into a 4% conversion lift across millions of orders.</div>
+        </div>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon-wrap">
+          <!-- Loyalty / repeat -->
+          <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 24S4 17.5 4 10.5A5.5 5.5 0 0114 8a5.5 5.5 0 0110 2.5C24 17.5 14 24 14 24z" stroke="#0052F2" stroke-width="1.6" stroke-linejoin="round" fill="none"/>
+          </svg>
+        </div>
+        <div class="feature-text">
+          <div class="feature-title" contenteditable="true">Loyalty &amp; Retention</div>
+          <div class="feature-desc" contenteditable="true">Turn loyalty and order history into repeat visits and bigger baskets, with experiments and session replay to test what brings guests back.</div>
+        </div>
+      </div>
+
+    </div><!-- /features-grid -->
+
+  </div><!-- /body -->
+
+  <!-- QUOTE STRIP -->
+  <div class="quote-strip">
+    <div class="quote-strip-label" contenteditable="true">In their own words</div>
+    <div class="quote-strip-row">
+      <div class="qs-item">
+        <div class="qs-text" contenteditable="true">"We talked to many vendors, but only Amplitude offered the combination of a robust analytics platform with a superior customer success offering."</div>
+        <div class="qs-attr" contenteditable="true"><b>Perri Myers</b> · Product Marketing, Menu Strategy, Taco Bell</div>
+      </div>
+      <div class="qs-item">
+        <div class="qs-text" contenteditable="true">"We've overcome our data challenges and harnessed the full potential of our data, driving significant business growth and better decision-making across the organization."</div>
+        <div class="qs-attr" contenteditable="true"><b>Perri Myers</b> · Product Marketing, Menu Strategy, Taco Bell</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGO STRIP -->
+  <div class="logo-strip">
+    <div class="logo-strip-label" contenteditable="true">Quick-service leaders build on Amplitude</div>
+    <div class="logos-row" id="logos-row">
+      <div class="logo-slot" onclick="triggerLogoUpload(0)" title="Click to upload logo">
+        <span class="logo-slot-text" contenteditable="true" onclick="event.stopPropagation()">Burger King</span>
+        <div class="logo-slot-overlay"><span>Upload</span></div>
+      </div>
+      <div class="logo-slot" onclick="triggerLogoUpload(1)" title="Click to upload logo">
+        <span class="logo-slot-text" contenteditable="true" onclick="event.stopPropagation()">Popeyes</span>
+        <div class="logo-slot-overlay"><span>Upload</span></div>
+      </div>
+      <div class="logo-slot" onclick="triggerLogoUpload(2)" title="Click to upload logo">
+        <span class="logo-slot-text" contenteditable="true" onclick="event.stopPropagation()">Tim Hortons</span>
+        <div class="logo-slot-overlay"><span>Upload</span></div>
+      </div>
+      <div class="logo-slot" onclick="triggerLogoUpload(3)" title="Click to upload logo">
+        <span class="logo-slot-text" contenteditable="true" onclick="event.stopPropagation()">Taco Bell</span>
+        <div class="logo-slot-overlay"><span>Upload</span></div>
+      </div>
+      <div class="logo-slot" onclick="triggerLogoUpload(4)" title="Click to upload logo">
+        <span class="logo-slot-text" contenteditable="true" onclick="event.stopPropagation()">KFC</span>
+        <div class="logo-slot-overlay"><span>Upload</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-copy">© 2026 Amplitude Inc. Confidential. All Rights Reserved.</div>
+    <div class="ae-block">
+      <div class="ae-name" contenteditable="true">Sean Bell McDermott</div>
+      <div class="ae-title" contenteditable="true">Enterprise Account Executive – QSR</div>
+      <div class="ae-contact" contenteditable="true">seanbell.mcdermott@amplitude.com</div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+// ── Image uploads ──
+function readFile(file, cb) {
+  const r = new FileReader();
+  r.onload = e => cb(e.target.result);
+  r.readAsDataURL(file);
+}
+
+// Amplitude logo
+document.getElementById('upload-amp-logo').addEventListener('change', function() {
+  if (!this.files[0]) return;
+  readFile(this.files[0], url => {
+    document.getElementById('amp-logo-display').innerHTML = `<img src="${url}" class="amp-logo-img" alt="Amplitude" style="filter:none;">`;
+  });
+  this.value = '';
+});
+
+// Screenshot / quote card
+document.getElementById('upload-screenshot').addEventListener('change', function() {
+  if (!this.files[0]) return;
+  readFile(this.files[0], url => {
+    const img = document.getElementById('screenshot-img');
+    img.src = url;
+    img.style.display = 'block';
+    document.getElementById('screenshot-placeholder').style.display = 'none';
+    document.getElementById('remove-screenshot-btn').style.display = 'flex';
+  });
+  this.value = '';
+});
+
+function removeScreenshot() {
+  const img = document.getElementById('screenshot-img');
+  img.style.display = 'none';
+  img.src = '';
+  document.getElementById('screenshot-placeholder').style.display = 'block';
+  document.getElementById('remove-screenshot-btn').style.display = 'none';
+}
+
+// Customer / brand logos
+function triggerLogoUpload(idx) {
+  document.getElementById('upload-logo-' + idx).click();
+}
+for (let i = 0; i < 5; i++) {
+  (function(idx) {
+    document.getElementById('upload-logo-' + idx).addEventListener('change', function() {
+      if (!this.files[0]) return;
+      readFile(this.files[0], url => {
+        const slot = document.querySelectorAll('.logo-slot')[idx];
+        const textEl = slot.querySelector('.logo-slot-text');
+        if (textEl) textEl.style.display = 'none';
+        let imgEl = slot.querySelector('.logo-slot-img');
+        if (!imgEl) {
+          imgEl = document.createElement('img');
+          imgEl.className = 'logo-slot-img';
+          slot.insertBefore(imgEl, slot.querySelector('.logo-slot-overlay'));
+        }
+        imgEl.src = url;
+        imgEl.style.display = 'block';
+      });
+      this.value = '';
+    });
+  })(i);
+}
+</script>
+</body>
+</html>
