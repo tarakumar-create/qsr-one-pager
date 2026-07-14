@@ -466,7 +466,11 @@ input[type=file] { display: none; }
   <div class="toolbar-sep"></div>
   <span class="toolbar-item">🖼️ Hover images to replace</span>
   <div class="toolbar-sep"></div>
+  <button class="toolbar-item" onclick="saveEdits()">💾 Save edits</button>
+  <div class="toolbar-sep"></div>
   <button class="toolbar-item" onclick="window.print()">⬇️ Save as PDF</button>
+  <div class="toolbar-sep"></div>
+  <button class="toolbar-item" onclick="resetPage()">↺ Reset</button>
 </div>
 
 <!-- PAGE -->
@@ -649,6 +653,22 @@ function readFile(file, cb) {
   const r = new FileReader();
   r.onload = e => cb(e.target.result);
   r.readAsDataURL(file);
+}
+
+// Save the current edited page (text + uploaded images) as a downloadable HTML file
+function saveEdits() {
+  const doc = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+  const blob = new Blob([doc], { type: 'text/html' });
+  const a = document.createElement('a');
+  const name = (document.title || 'one-pager').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  a.href = URL.createObjectURL(blob);
+  a.download = name + '-edited.html';
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+// Revert to the original (discards in-page edits)
+function resetPage() {
+  if (confirm('Reset all edits and reload the original?')) location.reload();
 }
 
 // Amplitude logo
